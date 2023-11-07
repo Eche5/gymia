@@ -8,7 +8,7 @@ const DB = process.env.DATABASE;
 mongoose.connect(DB).then(() => {
   console.log("DB is running");
 });
-const PORT = 7000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`app is running on port ${PORT}`);
 });
