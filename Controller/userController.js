@@ -23,6 +23,24 @@ exports.createUser = asyncHandler(async function(req, res) {
   }
 });
 
+function generateAndSetTokens(res, id, accessTokenSecret, refreshTokenSecret) {
+  const accessToken = jwt.sign({ id }, accessTokenSecret, {
+    expiresIn: "10m",
+  });
+  const refreshToken = jwt.sign({ id }, refreshTokenSecret, {
+    expiresIn: "30m",
+  });
+
+  res.cookie("jwt", refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  return accessToken;
+}
+
 exports.Login = async function(req, res) {
   const { email, password } = req.body;
 
@@ -39,34 +57,30 @@ exports.Login = async function(req, res) {
   let match = false;
   if (user) {
     match = await user.comparePassword(password, user.password);
+    const accessToken = generateAndSetTokens(
+      res,
+      user.email,
+      process.env.JWT_SECRET,
+      process.env.REFRESH_JWT_SECRET
+    );
+    res.status(200).json({ data: user, accessToken });
   }
 
   let matchadmin = false;
   if (admin) {
     matchadmin = await admin.comparePassword(password, admin.password);
+    const accessToken = generateAndSetTokens(
+      res,
+      admin.email,
+      process.env.JWT_SECRET,
+      process.env.REFRESH_JWT_SECRET
+    );
+    res.status(200).json({ data: admin, accessToken });
   }
 
   if (!match && !matchadmin) {
     return res.status(401).json({
       message: "Email or password is incorrect",
     });
-  } else {
-    const accessToken = jwt.sign({ id: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "10m",
-    });
-    const refreshToken = jwt.sign(
-      { id: user.email },
-      process.env.REFRESH_JWT_SECRET,
-      {
-        expiresIn: "30m",
-      }
-    );
-    res.cookie("jwt", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-    res.status(200).json({ data: user || admin, accessToken });
   }
 };
