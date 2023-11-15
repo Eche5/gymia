@@ -41,6 +41,24 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please provide your phone number"],
     unique: true,
   },
+  gender: {
+    type: String,
+    enum: ["Male", "Female"],
+  },
+  weight: {
+    type: Number,
+  },
+  DOB: { type: String },
+  height: {
+    type: Number,
+  },
+  medicalCondition: {
+    type: String,
+    enum: ["Yes", "No"],
+  },
+  address: {
+    type: String,
+  },
   isVerified: {
     type: Boolean,
     default: false,

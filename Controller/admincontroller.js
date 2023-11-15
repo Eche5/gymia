@@ -32,15 +32,15 @@ exports.getAllUsers = async function(req, res) {
       .json({ status: "failed", message: "something went wrong" });
   }
 };
-// exports.Login = async function(req, res) {
-//   const { email, password } = req.body;
+exports.Login = async function(req, res) {
+  const { email, password } = req.body;
 
-//   const admin = await Admin.findOne({ email });
-//   if (!admin) {
-//     return res.status(401).json({
-//       message: "email does not belong to an existing user or is unauthorized",
-//     });
-//   } else {
-//     return res.status(200).json({ status: "success", data: admin });
-//   }
-// };
+  const admin = await Admin.findOne({ email });
+  if (!admin) {
+    return res.status(401).json({
+      message: "email does not belong to an existing user or is unauthorized",
+    });
+  } else {
+    return res.status(200).json({ status: "success", data: admin });
+  }
+};

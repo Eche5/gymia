@@ -84,3 +84,22 @@ exports.Login = async function(req, res) {
     });
   }
 };
+
+exports.updateUserInfo = async function(req, res) {
+  const id = req.params.id;
+  const updatedUser = await User.findByIdAndUpdate(id, {
+    weight: req.body.weight,
+    height: req.body.height,
+    address: req.body.address,
+    medicalCondition: req.body.medicalCondition,
+    gender: req.body.gender,
+    DOB: req.body.DOB,
+  });
+  return res.status(200).json({ updatedUser });
+};
+
+exports.getUser = async function(req, res) {
+  const id = req.params.id;
+  const user = await User.findById(id);
+  return res.status(200).json({ user });
+};

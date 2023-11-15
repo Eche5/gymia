@@ -1,29 +1,10 @@
-// const express = require("express");
-// const cors = require("cors");
-// const credentials = require("./middlewares/credentials");
-
-// const corsOptions = require("./config/corsOptions");
-// const adminrouter = require("./Routes/adminRoutes");
-// const userRouter = require("./Routes/userRoute");
-
-// const app = express();
-// app.use(credentials);
-// app.use(express.json());
-// app.use(cors(corsOptions));
-
-// app.use("/admin", adminrouter);
-
-// app.use("/users", userRouter);
-
-// module.exports = app;
-// app.js
-
 const express = require("express");
 const cors = require("cors");
 const credentials = require("./middlewares/credentials");
 const socketIo = require("socket.io");
 const http = require("http");
 const User = require("./Model/userModel");
+const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions");
 const adminrouter = require("./Routes/adminRoutes");
 const userRouter = require("./Routes/userRoute");
@@ -31,6 +12,7 @@ const userRouter = require("./Routes/userRoute");
 const Message = require("./Model/messageModel"); // Assuming you have a Message model
 
 const app = express();
+app.use(cookieParser());
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: corsOptions,
