@@ -80,7 +80,7 @@ exports.Login = async function(req, res) {
 
   if (!match && !matchadmin) {
     return res.status(401).json({
-      message: "Email or password is incorrect",
+      message: "Email or Password is incorrect",
     });
   }
 };
