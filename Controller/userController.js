@@ -89,7 +89,7 @@ exports.googleAuth = async (req, res) => {
   const accessToken = req.query.token;
   const user = await User.findOne({ email });
   const admin = await Admin.findOne({ email });
-  if ((user && user.isVerified) || (admin && admin.isVerified)) {
+  if ((user && user?.isVerified) || (admin && admin?.isVerified)) {
     const refreshToken = jwt.sign(
       { id: user.email || admin.email },
       process.env.REFRESH_JWT_SECRET,
@@ -103,8 +103,8 @@ exports.googleAuth = async (req, res) => {
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({ data: admin || user, accessToken });
-  } else if (!user.isVerified || !admin.isVerified) {
+    return res.status(200).json({ data: user, accessToken });
+  } else if (!user?.isVerified || !admin?.isVerified) {
     return res.status(401).json({
       status: "failed",
       message: "please verify your email",
