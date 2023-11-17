@@ -54,31 +54,18 @@ exports.Login = async function(req, res) {
     });
   }
 
-  let match = false;
-  if (user) {
-    match = await user.comparePassword(password, user.password);
+  const match = await user?.comparePassword(password, user.password);
+  const matchadmin = await admin?.comparePassword(password, admin.password);
+
+  if ((user && match) || (admin && matchadmin)) {
     const accessToken = generateAndSetTokens(
       res,
-      user.email,
+      user?.email || admin?.email,
       process.env.JWT_SECRET,
       process.env.REFRESH_JWT_SECRET
     );
-    res.status(200).json({ data: user, accessToken });
-  }
-
-  let matchadmin = false;
-  if (admin) {
-    matchadmin = await admin.comparePassword(password, admin.password);
-    const accessToken = generateAndSetTokens(
-      res,
-      admin.email,
-      process.env.JWT_SECRET,
-      process.env.REFRESH_JWT_SECRET
-    );
-    res.status(200).json({ data: admin, accessToken });
-  }
-
-  if (!match && !matchadmin) {
+    return res.status(200).json({ data: user || admin, accessToken });
+  } else {
     return res.status(401).json({
       message: "Email or Password is incorrect",
     });
@@ -97,9 +84,45 @@ exports.updateUserInfo = async function(req, res) {
   });
   return res.status(200).json({ updatedUser });
 };
-
+exports.googleAuth = async (req, res) => {
+  const email = req.query.email;
+  const accessToken = req.query.token;
+  const user = await User.findOne({ email });
+  const admin = await Admin.findOne({ email });
+  if ((user && user.isVerified) || (admin && admin.isVerified)) {
+    const refreshToken = jwt.sign(
+      { id: user.email || admin.email },
+      process.env.REFRESH_JWT_SECRET,
+      {
+        expiresIn: "30m",
+      }
+    );
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.status(200).json({ data: admin || user, accessToken });
+  } else if (!user.isVerified || !admin.isVerified) {
+    return res.status(401).json({
+      status: "failed",
+      message: "please verify your email",
+    });
+  } else {
+    return res
+      .status(403)
+      .json({ message: "email does not belong to an existing user" });
+  }
+};
 exports.getUser = async function(req, res) {
   const id = req.params.id;
   const user = await User.findById(id);
   return res.status(200).json({ user });
+};
+exports.LogOut = async (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(204);
+  res.clearCookie("jwt", { httpOnly: true, secure: true, sameSite: "None" });
+  return res.json({ message: "cookie cleared" });
 };

@@ -4,7 +4,7 @@ const User = require("../Model/userModel");
 exports.refreshTokenHandler = async function(req, res) {
   const cookies = req.cookies;
 
-  if (!cookies?.jwt) return res.status(400).json({ message: "unauthorized" });
+  if (!cookies?.jwt) return res.status(401).json({ message: "unauthorized" });
   const refreshToken = cookies.jwt;
   jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET, async function(
     err,
@@ -21,6 +21,6 @@ exports.refreshTokenHandler = async function(req, res) {
         expiresIn: "10m",
       }
     );
-    return res.status(200).json({ accessToken, data: user });
+    res.json({ accessToken, data: user });
   });
 };

@@ -8,6 +8,8 @@ const router = express.Router();
 
 router.route("/register").post(usercontroller.createUser);
 router.route("/auth").post(usercontroller.Login);
+router.route("/googleAuth", usercontroller.googleAuth);
+router.route("/logout", usercontroller.LogOut);
 router
   .route("/:id")
   .patch(usercontroller.updateUserInfo)
