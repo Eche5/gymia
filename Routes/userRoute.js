@@ -10,6 +10,12 @@ router.route("/register").post(usercontroller.createUser);
 router.route("/auth").post(usercontroller.Login);
 router.route("/googleAuth").get(usercontroller.googleAuth);
 router.route("/logout").post(usercontroller.LogOut);
+router.route("/forgotpassword").post(usercontroller.forgotPassword);
+router.route("/verify/:id").patch(usercontroller.verify);
+router.route("/verify").post(usercontroller.resendverification);
+
+router.route("/resetpassword/:id/:token").patch(usercontroller.resetPassword);
+
 router
   .route("/:id")
   .patch(usercontroller.updateUserInfo)
