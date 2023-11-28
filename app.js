@@ -3,7 +3,6 @@ const cors = require("cors");
 const credentials = require("./middlewares/credentials");
 const socketIo = require("socket.io");
 const http = require("http");
-const User = require("./Model/userModel");
 const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions");
 const adminrouter = require("./Routes/adminRoutes");
